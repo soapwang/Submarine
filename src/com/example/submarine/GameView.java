@@ -11,11 +11,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
 //绘图线程在此类中工作，fps=30
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
@@ -24,6 +22,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 	public final static int LEFT = 1;
 	public final static int RIGHT = 2;
 	private final static int REFILL_TIME = 60;
+	private final static int EXPLODE_TIME = 5;
 	
 	private ArrayList<Bomb> bombList;	//用来存放所有炸弹信息
 	private int ammo;	//剩余弹药量
@@ -37,6 +36,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 	private int boatHeightHalf;
 	private int bombRadius;
 	private int refillTimer;
+	private int explodeTimer;	//控制爆炸效果的时间
 	private SurfaceHolder surfaceHolder; 
 	private boolean exitThread = false;
 	private boolean haveFoes = false;
@@ -46,11 +46,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 	private Bitmap backgroundPic;	//背景图片
 	private Bitmap boatPic;
 	private Bitmap subPic;
+	private Bitmap explodePic;
 	public static final String UPDATE_AMMO = "com.example.submarine.updateammo";
 	public static final String UPDATE_SCORE_10 = "com.example.submarine.updatescore10";
 	private Rect surfaceFrame;	//确定sufaceView的显示范围
 	private Context mContext;
 	private Rect boatRect;	//船只占据的矩形区域
+	private Rect explodeRect;
 
 
 	public GameView(Context context) {
@@ -61,10 +63,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         bombList = new ArrayList<Bomb>();
         ammo = 5;
         refillTimer = REFILL_TIME;
+        explodeTimer = EXPLODE_TIME;
         backgroundPic = 
         		BitmapFactory.decodeResource(getResources(), R.drawable.bg); //加载背景图片
         boatPic = BitmapFactory.decodeResource(getResources(), R.drawable.destoryer);
-        subPic = BitmapFactory.decodeResource(getResources(), R.drawable.sub1);
+        subPic = BitmapFactory.decodeResource(getResources(), R.drawable.sub_1r);
+        explodePic = BitmapFactory.decodeResource(getResources(), R.drawable.explode);
         
 	}
 	
@@ -176,6 +180,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 	             if(hit(b,foe1)) {
 	            	 b.setExplode(true);
 	            	 foe1.setHitStatus(true);
+	            	 explodeRect.set(
+	            			 b.getPositionX()-boatWidthHalf, b.getPositionY()-boatWidthHalf, b.getPositionX()+boatWidthHalf, b.getPositionY()+boatWidthHalf);
+	            	 canvas.drawBitmap(explodePic, null, explodeRect, null);
+	            	 explodeTimer--;
 	             }
 	             if (!b.isExplode()) {
 	            	 canvas.drawCircle(b.getPositionX(), b.getPositionY(), bombRadius, paint);
@@ -199,6 +207,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 	        		 foe1.setPosition(0, height - yPos);
 	        	 }
 	        	 
+	         }
+	         if(explodeTimer < EXPLODE_TIME && explodeTimer >= 0) {
+            	 canvas.drawBitmap(explodePic, null, explodeRect, null);
+            	 explodeTimer--;
+	         } else if(explodeTimer < 0) {
+	        	 explodeTimer = 5;
 	         }
 	    	 surfaceHolder.unlockCanvasAndPost(canvas);
 	     }
@@ -233,12 +247,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
         height = surfaceFrame.height();
         xPos = width / 2;
         yPos = height / 4;
-        boatSpeed = width / 90;
+        boatSpeed = width / 80;
         bombSpeed = height / 90;
         boatWidthHalf = width /24;
         boatHeightHalf = boatWidthHalf / 2;
         bombRadius = boatWidthHalf / 5;
         boatRect = new Rect();
+   	 	explodeRect = new Rect();
         draw();
         foe1 = new Foe(0, height - yPos, boatSpeed - 4);
         haveFoes = true;
