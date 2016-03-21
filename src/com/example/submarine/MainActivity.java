@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				gameView.createBomb();
 				int ammo = gameView.getAmmoCount();
-				ammoText.setText("AMMO:" + ammo);
+				ammoText.setText("X" + ammo);
 			}
 				
         });
@@ -113,7 +113,7 @@ public class MainActivity extends Activity {
             {  
             	//Log.d("submarine","get update intent");
             	int ammo = gameView.getAmmoCount();
-            	ammoText.setText("AMMO:" + ammo);
+            	ammoText.setText("X" + ammo);
             }  else if(intent.getAction().equals(GameView.UPDATE_SCORE_10)) {
             	score += 10;
             	Log.d("submarine","update score");

@@ -43,21 +43,31 @@
         android:layout_marginRight="15dp"
         android:text="Bomb" />
 
-    <TextView
-        android:id="@+id/scoreText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/ammoText"
-        android:text="Score:0"
-        android:textColor="#FF0000" />
+    <ImageView
+        android:id="@+id/ammoImage"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_below="@+id/scoreText"
+		android:layout_marginLeft="5dp"
+        android:src="@drawable/depth_charge"
+         />
 
     <TextView
         android:id="@+id/ammoText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/scoreText"
-		android:layout_marginLeft="5dp"
-        android:text="AMMO:5"
+        android:layout_alignBottom="@+id/ammoImage"
+        android:layout_toRightOf="@+id/ammoImage"
+        android:text="X5"
+        android:textColor="#FF0000" />
+
+    <TextView
+        android:id="@+id/scoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ammoImage"
+        android:layout_alignParentTop="true"
+        android:text="Score:0"
         android:textColor="#FF0000" />
 
 </RelativeLayout>
