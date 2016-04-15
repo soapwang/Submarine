@@ -51,6 +51,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 	private SurfaceHolder surfaceHolder; 
 	private boolean exitThread = false;
 	private boolean haveFoes = false;
+	private boolean running;
 	private int direction;
 	private Canvas canvas;
 	private Foe foe;
@@ -114,11 +115,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 	
 	public void startThread() {
 		exitThread = false;
+		running = true;
 		new Thread(this).start();
 	}
 	
 	public void stopThread() {
 		exitThread = true;
+	}
+	
+	public void pauseGame() {
+		running =  false;
+	}
+	
+	public void resumeGame() {
+		running = true;
 	}
 	
 	public void setDirection(int direct) {
@@ -145,46 +155,56 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
               time = cTime;    
           }    
           */
+    	
     	while(!exitThread) {
-    		if(ammo != 5) {
-        		refillTimer--;
-        		if(refillTimer < 0) {
-        			refill();
-        			refillTimer = REFILL_TIME;
-        			Intent i = new Intent(UPDATE_AMMO);
-        			mContext.sendBroadcast(i);
-        			//Log.d("submarine","send update intent");
+    		if(running) {
+        		if(ammo != 5) {
+            		refillTimer--;
+            		if(refillTimer < 0) {
+            			refill();
+            			refillTimer = REFILL_TIME;
+            			Intent i = new Intent(UPDATE_AMMO);
+            			mContext.sendBroadcast(i);
+            			//Log.d("submarine","send update intent");
+            		}
         		}
+
+        		switch(direction) {
+            	case LEFT: 
+                    moveLeftBoat();
+                    draw(); 
+                    try {  
+                    	Thread.sleep(20);  
+                    } catch (InterruptedException e) {   
+                    	e.printStackTrace();  
+                    }  
+            		break;
+            	case RIGHT:
+                    moveRightBoat();
+                    draw(); 
+                    try {  
+                    		Thread.sleep(20);  
+                    } catch (InterruptedException e) {   
+                    	e.printStackTrace();  
+                    } 
+            		break;
+            	default:
+            		draw();
+                	try {  
+                		Thread.sleep(20);  
+                	} catch (InterruptedException e) {   
+                		e.printStackTrace();  
+                	} 
+            		break;
+            	}
+    		} else {
+    			try {  
+            		Thread.sleep(100);  
+    			} catch (InterruptedException e) {   
+    				e.printStackTrace();  
+    			} 
     		}
 
-    		switch(direction) {
-        	case LEFT: 
-                moveLeftBoat();
-                draw(); 
-                try {  
-                	Thread.sleep(20);  
-                } catch (InterruptedException e) {   
-                	e.printStackTrace();  
-                }  
-        		break;
-        	case RIGHT:
-                moveRightBoat();
-                draw(); 
-                try {  
-                		Thread.sleep(20);  
-                } catch (InterruptedException e) {   
-                	e.printStackTrace();  
-                } 
-        		break;
-        	default:
-        		draw();
-            	try {  
-            		Thread.sleep(20);  
-            	} catch (InterruptedException e) {   
-            		e.printStackTrace();  
-            	} 
-        		break;
-        	}
     	}
     	
 
@@ -210,8 +230,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Run
 	     synchronized(surfaceHolder){  
 	    	 canvas = surfaceHolder.lockCanvas();
 	    	 canvas.drawBitmap(backgroundPic, null, surfaceFrame, null);	//绘制背景图像
-	    	 Paint paint = new Paint();  	    	 
-	         paint.setColor(Color.GREEN);
 	         boatRect.set(xPos-boatWidthHalf, yPos-boatHeightHalf, xPos+boatWidthHalf, yPos+boatHeightHalf);
 	         canvas.drawBitmap(boatPic, null, boatRect, null);
 	     	 //由于要remove，用迭代器实现

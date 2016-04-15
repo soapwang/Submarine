@@ -70,4 +70,13 @@
         android:text="Score:0"
         android:textColor="#FF0000" />
 
+    <Button
+        android:id="@+id/pause_button"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/pause" />
+
 </RelativeLayout>
